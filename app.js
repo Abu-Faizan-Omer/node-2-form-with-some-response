@@ -1,8 +1,10 @@
 const http=require("http")
+const fs=require("fs")
 const myserver=http.createServer((req,res)=>{
     res.setHeader('Content-Type','text/html')
     
     let url=req.url
+    const method=req.method
 
     if(url==="/")
     {
@@ -10,6 +12,13 @@ const myserver=http.createServer((req,res)=>{
         res.write("<head><title>Enter message </title></head>")
         res.write('<body><form action="/message" method="POST"><input type="text" name="message"><button type="submit">Send</button></form></body>')
         res.write("</html>")
+        return res.end()
+    }
+    if(url==="/message" && method==="POST")
+    {
+        fs.writeFileSync("message.txt","Dummy")
+        res.statusCode=302
+        res.setHeader("Location","/")
         return res.end()
     }
     res.write("<html>")
