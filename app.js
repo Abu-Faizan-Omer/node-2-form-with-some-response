@@ -1,5 +1,6 @@
 const http=require("http")
 const fs=require("fs")
+const { buffer } = require("stream/consumers")
 const myserver=http.createServer((req,res)=>{
     res.setHeader('Content-Type','text/html')
     
@@ -16,7 +17,16 @@ const myserver=http.createServer((req,res)=>{
     }
     if(url==="/message" && method==="POST")
     {
-        fs.writeFileSync("message.txt","Dummy")
+        const body=[]
+        req.on('data',(chunk)=>{
+            console.log(chunk)
+            body.push(chunk)
+        })
+        req.on('end',()=>{
+            const parsedbody=Buffer.concat(body).toString()
+            const message=parsedbody.split("=")[1]
+            fs.writeFileSync("message.txt",message)
+        })
         res.statusCode=302
         res.setHeader("Location","/")
         return res.end()
